@@ -26,6 +26,12 @@ class LaranailServiceProvider extends ServiceProvider
     public function register()
     {
 
+        // register other service providers
+        $this->app->register(BladeServiceProvider::class);
+        $this->app->register(MacrosServiceProvider::class);
+        $this->app->register(ArchiverServiceProvider::class);
+        $this->app->register(LaravelMiddlewareServiceProvider::class);
+
         $this->loadTranslationsFrom(self::PACKAGE_PATH . "resources/lang/", $this->packageName);
         $this->loadMigrationsFrom(self::PACKAGE_PATH . 'database/migrations');
         $this->loadViewsFrom(self::PACKAGE_PATH . "resources/views", $this->packageName);
@@ -42,12 +48,6 @@ class LaranailServiceProvider extends ServiceProvider
     {
 
         $this->registerConsoles();
-
-        // register other service providers
-        $this->app->register(BladeServiceProvider::class);
-        $this->app->register(MacrosServiceProvider::class);
-        $this->app->register(ArchiverServiceProvider::class);
-        $this->app->register(LaravelMiddlewareServiceProvider::class);
     }
 
     private function registerConsoles(): static

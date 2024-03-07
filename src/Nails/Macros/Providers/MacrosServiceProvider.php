@@ -975,7 +975,7 @@ class MacrosServiceProvider extends ServiceProvider
                     $schema->nullable();
                 }
 
-                if (! isset($options['no_reference'])) {
+                if (!isset($options['no_reference'])) {
                     $this->referenceOn($fk, $table, $reference);
                 }
 
@@ -1170,18 +1170,15 @@ class MacrosServiceProvider extends ServiceProvider
             return $this;
         };
 
-        if (! Response::hasMacro('withMeta'))
-        {
+        if (!Response::hasMacro('withMeta')) {
             Response::macro('withMeta', $withMeta);
         }
 
-        if (! JsonResponse::hasMacro('withMeta'))
-        {
+        if (!JsonResponse::hasMacro('withMeta')) {
             JsonResponse::macro('withMeta', $withMeta);
         }
 
-        if (! ResponseFactory::hasMacro('withMeta'))
-        {
+        if (!ResponseFactory::hasMacro('withMeta')) {
             ResponseFactory::macro('withMeta', $withMeta);
         }
 
@@ -1190,13 +1187,13 @@ class MacrosServiceProvider extends ServiceProvider
     private function loadArrMacros()
     {
 
-        if (! Arr::hasMacro('hasSameKeysAndValues')) {
+        if (!Arr::hasMacro('hasSameKeysAndValues')) {
             Arr::macro('hasSameKeysAndValues', function(array $a, array $b, bool $strict = false) {
                 return pheg()->arr()->compareArrayKeyValuesSimilarity($a, $b, $strict);
             });
         }
 
-        if (! Arr::hasMacro('getKeyValueFromAttributes')) {
+        if (!Arr::hasMacro('getKeyValueFromAttributes')) {
 
             /**
              * Get the key value from the given attributes.
@@ -1234,7 +1231,7 @@ class MacrosServiceProvider extends ServiceProvider
 
         foreach (['success', 'info', 'danger', 'warning'] as $type)
         {
-            if (! RedirectResponse::hasMacro($type))
+            if (!RedirectResponse::hasMacro($type))
             {
                 RedirectResponse::macro($type, function ($message) use ($type) {
                     return $this->with($type, $message);
