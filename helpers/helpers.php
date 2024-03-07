@@ -1,7 +1,5 @@
 <?php
 
-use Illuminate\Support\Arr;
-
 if (!function_exists('path2plugin')) {
     /**
      * @param string|null $path
@@ -44,10 +42,4 @@ if (!function_exists('path2package')) {
     {
         return path2platform('packages/' . $path);
     }
-}
-
-
-if (! function_exists('getKeyValueFromAttributes')) {
-
-
 }
