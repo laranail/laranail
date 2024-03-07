@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Support\Arr;
+
 if (!function_exists('path2plugin')) {
     /**
      * @param string|null $path
