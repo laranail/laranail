@@ -21,6 +21,7 @@
     ],
     "require": {
         "ext-zip": "*",
+        "php": ">=8.3",
         "simtabi/pheg": "dev-master",
         "spatie/laravel-sluggable": "dev-main",
         "ichtrojan/laravel-otp": "dev-master",

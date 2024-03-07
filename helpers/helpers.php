@@ -43,3 +43,25 @@ if (!function_exists('path2package')) {
         return path2platform('packages/' . $path);
     }
 }
+
+
+if (! function_exists('getKeyValueFromAttributes')) {
+    function getKeyValueFromAttributes(object|array|string $attributes, ?string $key = null, $explodeNeedle = ",") : array
+    {
+        $attributes = empty($key) ? $attributes : Arr::get($attributes, $key, []);
+
+        if (is_array($attributes)) {
+            $values = $attributes;
+        } elseif (is_string($attributes)) {
+            if (json_validate($attributes)) {
+                $values = json_decode($attributes, true);
+            }else {
+                $values = explode($explodeNeedle, $attributes);
+            }
+        } else {
+            $values = [];
+        }
+
+        return array_filter($values);
+    }
+}
