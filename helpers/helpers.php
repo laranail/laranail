@@ -48,32 +48,6 @@ if (!function_exists('path2package')) {
 
 
 if (! function_exists('getKeyValueFromAttributes')) {
-    /**
-     * Get the key value from the given attributes.
-     *
-     * @param object|array|string $attributes
-     * @param string|null $key
-     * @param string $explodeNeedle
-     * @return array
-     */
-    function getKeyValueFromAttributes(object|array|string $attributes, ?string $key = null, string $explodeNeedle = ","): array
-    {
-        // Handle the case when a specific key is provided
-        if (!empty($key)) {
-            $attributes = is_array($attributes) ? ($attributes[$key] ?? []) : Arr::get($attributes, $key, []);
-        }
 
-        // Convert the attributes to an array of values
-        if (is_array($attributes)) {
-            $values = $attributes;
-        } elseif (is_string($attributes)) {
-            $values = json_validate($attributes) ? json_decode($attributes, true) : explode($explodeNeedle, $attributes);
-        } else {
-            $values = [];
-        }
-
-        // Filter out any empty values and return
-        return array_filter($values);
-    }
 
 }
