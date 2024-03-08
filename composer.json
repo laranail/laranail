@@ -20,13 +20,13 @@
         }
     ],
     "require": {
-        "ext-zip": "*",
         "php": ">=8.3",
-        "simtabi/pheg": "dev-master",
-        "spatie/laravel-sluggable": "dev-main",
-        "ichtrojan/laravel-otp": "dev-master",
-        "dyrynda/laravel-model-uuid": "^7.0.0",
-        "dyrynda/laravel-efficient-uuid": "^5.0.0"
+        "ext-zip": "*",
+        "simtabi/pheg": "*",
+        "spatie/laravel-sluggable": "*",
+        "ichtrojan/laravel-otp": "*",
+        "dyrynda/laravel-model-uuid": "*",
+        "dyrynda/laravel-efficient-uuid": "*"
     },
     "require-dev": {
 
