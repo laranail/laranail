@@ -6,7 +6,7 @@ use Illuminate\Support\ServiceProvider;
 use Simtabi\Laranail\Core\Commands\SetAppNamespace;
 use Simtabi\Laranail\Core\Commands\CleanupApplication;
 use Simtabi\Laranail\Nails\Archiver\Providers\ArchiverServiceProvider;
-use Simtabi\Laranail\Nails\Blade\Providers\BladeServiceProvider;
+use Simtabi\Laranail\Nails\Blade\BladeServiceProvider;
 use Simtabi\Laranail\Nails\Laravel\Providers\LaravelMiddlewareServiceProvider;
 use Simtabi\Laranail\Nails\Laravel\Traits\HasPackageTools;
 use Simtabi\Laranail\Nails\Macros\Providers\MacrosServiceProvider;

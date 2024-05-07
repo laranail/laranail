@@ -1,52 +1,16 @@
 <?php declare(strict_types=1);
 
-namespace Simtabi\Laranail\Nails\Blade\Providers;
+namespace Simtabi\Laranail\Nails\Blade;
 
-use Illuminate\Support\Facades\Blade;
-use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\View;
-use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
-use Simtabi\Laranail\Nails\Blade\Supports\DirectiveParser;
 
-class BladeServiceProvider extends ServiceProvider
+class Directives
 {
-    /**
-     * Register services.
-     *
-     * @return void
-     */
-    public function register()
+
+    public static function directives(): array
     {
-        //
-    }
 
-    /**
-     * Bootstrap services.
-     *
-     * @return void
-     */
-    public function boot()
-    {
-        $this->registerDirectives();
-    }
-
-
-    /**
-     * Register all directives.
-     *
-     * @return void
-     */
-    public function registerDirectives()
-    {
-        collect($this->directives())->each(function ($item, $key) {
-            Blade::directive($key, $item);
-        });
-    }
-
-
-    private function directives(): array
-    {
         return [
 
             /*
@@ -62,7 +26,7 @@ class BladeServiceProvider extends ServiceProvider
 
             'istrue' => function ($expression) {
                 if (Str::contains($expression, ',')) {
-                    $expression = DirectiveParser::multipleArgs($expression);
+                    $expression = self::multipleArgs($expression);
 
                     return implode('', [
                         "<?php if (isset({$expression->get(0)}) && (bool) {$expression->get(0)} === true) : ?>",
@@ -80,7 +44,7 @@ class BladeServiceProvider extends ServiceProvider
 
             'isfalse' => function ($expression) {
                 if (Str::contains($expression, ',')) {
-                    $expression = DirectiveParser::multipleArgs($expression);
+                    $expression = self::multipleArgs($expression);
 
                     return implode('', [
                         "<?php if (isset({$expression->get(0)}) && (bool) {$expression->get(0)} === false) : ?>",
@@ -109,7 +73,7 @@ class BladeServiceProvider extends ServiceProvider
 
             'isnull' => function ($expression) {
                 if (Str::contains($expression, ',')) {
-                    $expression = DirectiveParser::multipleArgs($expression);
+                    $expression = self::multipleArgs($expression);
 
                     return implode('', [
                         "<?php if (is_null({$expression->get(0)})) : ?>",
@@ -127,7 +91,7 @@ class BladeServiceProvider extends ServiceProvider
 
             'isnotnull' => function ($expression) {
                 if (Str::contains($expression, ',')) {
-                    $expression = DirectiveParser::multipleArgs($expression);
+                    $expression = self::multipleArgs($expression);
 
                     return implode('', [
                         "<?php if (! is_null({$expression->get(0)})) : ?>",
@@ -166,23 +130,27 @@ class BladeServiceProvider extends ServiceProvider
 
             /*
             |---------------------------------------------------------------------
-            | @style
+            | @stylesheet
             |---------------------------------------------------------------------
             |
-            | Usage: @style('/css/app.css') or @style body{ color: red; } @endstyle
+            | Usage: @addstyle('/css/app.css') or @addstyle body{ color: red; } @endaddstyle
             |
             */
 
-            'style' => function ($expression) {
-                if (! empty($expression)) {
-                    return '<link rel="stylesheet" href="'.DirectiveParser::stripQuotes($expression).'">';
+            'addstyle' => function ($expression, bool $linkAttribute = true) {
+                if ($linkAttribute) {
+                    return '<link rel="stylesheet" href="'.self::stripQuotes($expression).'">';
                 }
 
                 return '<style>';
             },
 
-            'endstyle' => function () {
-                return '</style>';
+            'endaddstyle' => function (bool $linkAttribute = true) {
+                if (!$linkAttribute) {
+                    return '</style>';
+                }
+
+                return '';
             },
 
             /*
@@ -190,19 +158,22 @@ class BladeServiceProvider extends ServiceProvider
             | @script
             |---------------------------------------------------------------------
             |
-            | Usage: @script('/js/app.js') or @script alert('Message') @endstyle
+            | Usage: @addscript('/js/app.js') or @addscript alert('Message') @endaddscript
             |
             */
 
-            'script' => function ($expression) {
-                if (! empty($expression)) {
-                    return '<script src="'.DirectiveParser::stripQuotes($expression).'"></script>';
+            'addscript' => function ($expression, bool $linkAttribute = true) {
+                if ($linkAttribute) {
+                    return '<script src="'.self::stripQuotes($expression).'"></script>';
                 }
 
                 return '<script>';
             },
 
-            'endscript' => function () {
+            'endscript' => function (bool $linkAttribute = true) {
+                if (!$linkAttribute) {
+                    return '</style>';
+                }
                 return '</script>';
             },
 
@@ -217,9 +188,9 @@ class BladeServiceProvider extends ServiceProvider
             */
 
             'window' => function ($expression) {
-                $expression = DirectiveParser::multipleArgs($expression);
+                $expression = self::multipleArgs($expression);
 
-                $variable = DirectiveParser::stripQuotes($expression->get(0));
+                $variable = self::stripQuotes($expression->get(0));
 
                 return  implode("\n", [
                     '<script>',
@@ -282,7 +253,7 @@ class BladeServiceProvider extends ServiceProvider
             */
 
             'instanceof' => function ($expression) {
-                $expression = DirectiveParser::multipleArgs($expression);
+                $expression = self::multipleArgs($expression);
 
                 return  "<?php if ({$expression->get(0)} instanceof {$expression->get(1)}) : ?>";
             },
@@ -298,7 +269,7 @@ class BladeServiceProvider extends ServiceProvider
             */
 
             'typeof' => function ($expression) {
-                $expression = DirectiveParser::multipleArgs($expression);
+                $expression = self::multipleArgs($expression);
 
                 return  "<?php if (gettype({$expression->get(0)}) == {$expression->get(1)}) : ?>";
             },
@@ -376,57 +347,57 @@ class BladeServiceProvider extends ServiceProvider
             */
 
             'fa' => function ($expression) {
-                $expression = DirectiveParser::multipleArgs($expression);
+                $expression = self::multipleArgs($expression);
 
-                return '<i class="fa fa-'.DirectiveParser::stripQuotes($expression->get(0)).' '.DirectiveParser::stripQuotes($expression->get(1)).'"></i>';
+                return '<i class="fa fa-'.self::stripQuotes($expression->get(0)).' '.self::stripQuotes($expression->get(1)).'"></i>';
             },
 
             'fad' => function ($expression) {
-                $expression = DirectiveParser::multipleArgs($expression);
+                $expression = self::multipleArgs($expression);
 
-                return '<i class="fad fa-'.DirectiveParser::stripQuotes($expression->get(0)).' '.DirectiveParser::stripQuotes($expression->get(1)).'"></i>';
+                return '<i class="fad fa-'.self::stripQuotes($expression->get(0)).' '.self::stripQuotes($expression->get(1)).'"></i>';
             },
 
             'fas' => function ($expression) {
-                $expression = DirectiveParser::multipleArgs($expression);
+                $expression = self::multipleArgs($expression);
 
-                return '<i class="fas fa-'.DirectiveParser::stripQuotes($expression->get(0)).' '.DirectiveParser::stripQuotes($expression->get(1)).'"></i>';
+                return '<i class="fas fa-'.self::stripQuotes($expression->get(0)).' '.self::stripQuotes($expression->get(1)).'"></i>';
             },
 
             'far' => function ($expression) {
-                $expression = DirectiveParser::multipleArgs($expression);
+                $expression = self::multipleArgs($expression);
 
-                return '<i class="far fa-'.DirectiveParser::stripQuotes($expression->get(0)).' '.DirectiveParser::stripQuotes($expression->get(1)).'"></i>';
+                return '<i class="far fa-'.self::stripQuotes($expression->get(0)).' '.self::stripQuotes($expression->get(1)).'"></i>';
             },
 
             'fal' => function ($expression) {
-                $expression = DirectiveParser::multipleArgs($expression);
+                $expression = self::multipleArgs($expression);
 
-                return '<i class="fal fa-'.DirectiveParser::stripQuotes($expression->get(0)).' '.DirectiveParser::stripQuotes($expression->get(1)).'"></i>';
+                return '<i class="fal fa-'.self::stripQuotes($expression->get(0)).' '.self::stripQuotes($expression->get(1)).'"></i>';
             },
 
             'fab' => function ($expression) {
-                $expression = DirectiveParser::multipleArgs($expression);
+                $expression = self::multipleArgs($expression);
 
-                return '<i class="fab fa-'.DirectiveParser::stripQuotes($expression->get(0)).' '.DirectiveParser::stripQuotes($expression->get(1)).'"></i>';
+                return '<i class="fab fa-'.self::stripQuotes($expression->get(0)).' '.self::stripQuotes($expression->get(1)).'"></i>';
             },
 
             'mdi' => function ($expression) {
-                $expression = DirectiveParser::multipleArgs($expression);
+                $expression = self::multipleArgs($expression);
 
-                return '<i class="mdi mdi-'.DirectiveParser::stripQuotes($expression->get(0)).' '.DirectiveParser::stripQuotes($expression->get(1)).'"></i>';
+                return '<i class="mdi mdi-'.self::stripQuotes($expression->get(0)).' '.self::stripQuotes($expression->get(1)).'"></i>';
             },
 
             'glyph' => function ($expression) {
-                $expression = DirectiveParser::multipleArgs($expression);
+                $expression = self::multipleArgs($expression);
 
-                return '<i class="glyphicons glyphicons-'.DirectiveParser::stripQuotes($expression->get(0)).' '.DirectiveParser::stripQuotes($expression->get(1)).'"></i>';
+                return '<i class="glyphicons glyphicons-'.self::stripQuotes($expression->get(0)).' '.self::stripQuotes($expression->get(1)).'"></i>';
             },
 
             'bi' => function ($expression) {
-                $expression = DirectiveParser::multipleArgs($expression);
+                $expression = self::multipleArgs($expression);
 
-                return '<i class="bi bi-'.DirectiveParser::stripQuotes($expression->get(0)).' '.DirectiveParser::stripQuotes($expression->get(1)).'"></i>';
+                return '<i class="bi bi-'.self::stripQuotes($expression->get(0)).' '.self::stripQuotes($expression->get(1)).'"></i>';
             },
 
             /*
@@ -445,20 +416,53 @@ class BladeServiceProvider extends ServiceProvider
 
             /*
             |---------------------------------------------------------------------
-            | @pushonce
+            | @count
+            |---------------------------------------------------------------------
+            |
+            | Usage: @count([1,2,3])
+            |
+            */
+
+            'count' => function ($expression) {
+                return '<?php echo '.count(json_decode($expression)).'; ?>';
+            },
+
+            /*
+            |---------------------------------------------------------------------
+            | @nl2br
             |---------------------------------------------------------------------
             */
 
-            'pushonce' => function ($expression) {
-                $domain      = explode(':', trim(substr($expression, 2, -2)));
-                $push_name   = $domain[0];
-                $push_sub    = $domain[1];
-                $isDisplayed = '__pushonce_'.$push_name.'_'.$push_sub;
-                return "<?php if(!isset(\$__env->{$isDisplayed})): \$__env->{$isDisplayed} = true; \$__env->startPush('{$push_name}'); ?>";
+            'nl2br' => function ($expression) {
+                return "<?php echo nl2br($expression); ?>";
             },
 
-            'endpushonce' => function () {
-                return '<?php $__env->stopPush(); endif; ?>';
+            /*
+            |---------------------------------------------------------------------
+            | @kebab, @snake, @camel
+            |---------------------------------------------------------------------
+            */
+
+            'kebab' => function ($expression) {
+                return '<?php echo '.Str::kebab($expression).'; ?>';
+            },
+
+            'snake' => function ($expression) {
+                return '<?php echo '.Str::snake($expression).'; ?>';
+            },
+
+            'camel' => function ($expression) {
+                return '<?php echo '.Str::camel($expression).'; ?>';
+            },
+
+            /*
+            |---------------------------------------------------------------------
+            | @returnifempty
+            |---------------------------------------------------------------------
+            */
+
+            'returnifempty' => function ($expression) {
+                return "<?php if (empty($expression) || ($expression && !count($expression))) { return; } ?>";
             },
 
             /*
@@ -467,7 +471,7 @@ class BladeServiceProvider extends ServiceProvider
             |---------------------------------------------------------------------
             */
 
-            'base64Image' => function ($expression) {
+            'base64image' => function ($expression) {
                 return "<?php echo 'data:image/' . pathinfo($expression, PATHINFO_EXTENSION) . ';base64,' . base64_encode(file_get_contents($expression)); ?>";
             },
 
@@ -478,16 +482,111 @@ class BladeServiceProvider extends ServiceProvider
             */
 
             'javascript' => function ($expression) {
-                $expression = $this->makeBackwardsCompatible($expression);
+                $expression = "({$expression})";
 
                 return "<?= app('\Simtabi\Laranail\Nails\Blade\Supports\DirectiveRenderer')->render{$expression}; ?>";
             },
 
+            /*
+            |---------------------------------------------------------------------
+            | @activeifroute
+            |---------------------------------------------------------------------
+            */
+
+            'activeifroute' => function ($expression) {
+                return "<?php echo strpos(request()->route()->getName(), {$expression}) === 0 ? 'active' : ''; ?>";
+            },
+
+            /*
+            |---------------------------------------------------------------------
+            | @selectedif
+            |---------------------------------------------------------------------
+            */
+
+            'selectedif' => function ($expression) {
+                return "<?php echo $expression ? 'selected' : ''; ?>";
+            },
+
+            /*
+            |---------------------------------------------------------------------
+            | @inputvalue
+            |---------------------------------------------------------------------
+            */
+
+            'inputvalue' => function ($expression) {
+                list($model, $parameter) = explode(',',str_replace(['(',')',' '], '', $expression));
+                $parameter = str_replace(["'", '"'], '', $parameter);
+
+                return "<?php if(isset($model)) echo e(old('$parameter', $model->$parameter)); else echo e(old('$parameter')); ?>";
+            },
+
+            /*
+            |---------------------------------------------------------------------
+            | @optionvalue
+            |---------------------------------------------------------------------
+            */
+
+            'optionvalue' => function ($expression) {
+                list($model, $parameter, $default) = explode(',',str_replace(['(',')',' '], '', $expression));
+                $parameter = str_replace(["'", '"'], '', $parameter);
+
+                return "<?php if((isset($model) && old('$parameter', $model->$parameter) == $default) || old('$parameter') == $default) echo 'selected=\"selected\"' ?>";
+            },
+
+            /*
+            |---------------------------------------------------------------------
+            | @checkboxvalue
+            |---------------------------------------------------------------------
+            */
+
+            'checkboxvalue' => function ($expression) {
+                list($model, $parameter) = explode(',',str_replace(['(',')',' '], '', $expression));
+                $parameter = str_replace(["'", '"'], '', $parameter);
+
+                return "<?php if((isset($model) && old('$parameter', $model->$parameter) == 1) || old('$parameter') == 1) echo 'checked=\"checked\"' ?>";
+            },
+
+            /*
+            |---------------------------------------------------------------------
+            | @checkboxvaluefromarray
+            |---------------------------------------------------------------------
+            */
+
+            'checkboxvaluefromarray' => function ($expression) {
+                list($model, $parameter, $array) = explode(',',str_replace(['(',')',' '], '', $expression));
+                $parameter = str_replace(["'", '"'], '', $parameter);
+
+                return "<?php if(collect(old('$parameter', []))->contains(".$model."->id) ||collect($array)->contains(function(\$item) use($model) {
+                    return \$item == ".$model."->id;
+                })) echo 'checked=\"checked\"' ?>";
+            },
+
         ];
+
     }
 
-    public function makeBackwardsCompatible($expression): string
+    /**
+     * Parse expression.
+     *
+     * @param  string  $expression
+     * @return Collection
+     */
+    private static function multipleArgs($expression): Collection
     {
-        return "({$expression})";
+        return collect(explode(',', $expression))->map(function ($item) {
+            return trim($item);
+        });
     }
+
+    /**
+     * Strip quotes.
+     *
+     * @param  string  $expression
+     * @return string
+     */
+    private static function stripQuotes($expression): string
+    {
+        return str_replace(["'", '"'], '', $expression);
+    }
+
 }

@@ -5,8 +5,6 @@ namespace Simtabi\Laranail\Nails\Livewire\Traits;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Pagination\LengthAwarePaginator;
-use Illuminate\Support\Collection;
-use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Livewire\WithPagination;
 use Livewire\WithFileUploads;
 use Simtabi\Larabell\HasLarabell;
@@ -395,19 +393,19 @@ trait HasLivewireEvents
         return $this;
     }
 
-    public function hydrate()
+    public function hydrate(): static
     {
         foreach ($this->hydrates as $hydrate)
         {
-            $this->emit($hydrate);
+            $this->dispatch($hydrate);
         }
 
-        $this->dispatchBrowserEvent('componentUpdated', ['status' => true]);
+        $this->dispatch('componentUpdated', ['status' => true]);
 
         return $this;
     }
 
-    protected function addToModelBinding(string $key, mixed $value)
+    protected function addToModelBinding(string $key, mixed $value): void
     {
         $this->modelBinding[trim($key)] = $value;
     }
@@ -417,12 +415,12 @@ trait HasLivewireEvents
         return $this->modelBinding[trim($key)] ?? $default;
     }
 
-    public function getModelBinding()
+    public function getModelBinding(): array
     {
         return $this->modelBinding;
     }
 
-    protected function initModelBinding(string $classNamespace, string|int $recordId = null, array $columns = [])
+    protected function initModelBinding(string $classNamespace, string|int $recordId = null, array $columns = []): void
     {
         // init model and get fillable
         $model   = new $classNamespace();
@@ -474,14 +472,14 @@ trait HasLivewireEvents
 
     public function refreshComponents(array $components)
     {
-        $this->dispatchBrowserEvent('refreshComponents', $components);
+        $this->dispatch('refreshComponents', $components);
 
         return $this;
     }
 
     public function refreshJsComponents(...$args)
     {
-        $this->dispatchBrowserEvent('refreshJsComponents', $args);
+        $this->dispatch('refreshJsComponents', $args);
 
         return $this;
     }
@@ -506,17 +504,13 @@ trait HasLivewireEvents
         return $this->triggerEvent('executesCustomEvents', $componentName, $toParent, ...$params);
     }
 
-    protected function triggerEvent($event, ?string $componentName = null, bool $toParent = false, ...$params)
+    protected function triggerEvent($event, ?string $componentName = null, ...$params)
     {
 
         if (!empty($componentName)) {
-            if ($toParent) {
-                $this->emitUp($event, $params);
-            }else{
-                $this->emitTo($componentName, $event, $params);
-            }
+            $this->dispatch($componentName, $event, $params);
         }else{
-            $this->emitSelf($event, $params);
+            $this->dispatch($event, $params);
         }
 
         return $this;
@@ -595,7 +589,7 @@ trait HasLivewireEvents
         return $this->getAuthenticatedUser()->email ?? null;
     }
 
-    public function seconds2milliseconds(int $seconds): int
+    public function seconds2milliseconds(int $seconds): float|int
     {
         return round($seconds * 1000);
     }

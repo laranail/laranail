@@ -108,7 +108,7 @@ class Avatar
     /**
      * @var string
      */
-    protected $font = __DIR__ . '/../../resources/assets/fonts/Roboto-Bold.ttf';
+    protected string $font = __DIR__ . '/../../../../resources/assets/fonts/Roboto-Bold.ttf';
 
     /**
      * @var string
