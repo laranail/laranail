@@ -46,7 +46,6 @@ class LaranailServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-
         $this->registerConsoles();
     }
 
