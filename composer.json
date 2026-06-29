@@ -2,6 +2,7 @@
     "name": "laranail/laranail",
     "license": "MIT",
     "description": "A highly opinionated, and comprehensive collection of useful code snippets, classes, and utility functions for the Laravel framework.",
+    "homepage": "https://opensource.simtabi.com/laranail/",
     "type": "library",
     "keywords": [
         "helpers",
